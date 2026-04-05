@@ -3,6 +3,11 @@
 // but allows Chrome to read it without needing localhost!
 
 const ZentroNixConfig = {
-    USERNAME: "BAotp",
-    PASSWORD: "BaSupp0rt@2026"
+    USERS: {
+        "BA": "BaSupp0rt@2026",
+        "ZB": "ZB@2@26",
+        "DR": "DR@2#111",
+        "RTM": "RTM@%125",
+        "RTN": "RTN$$#1458"
+    }
 };
