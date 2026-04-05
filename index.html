@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="TheBAlogo.png">
+  <title>ZentroNix - Secure Login</title>
+  <style>
+    :root {
+      --sky-1: #eaf8ff;
+      --sky-2: #d3f0ff;
+      --sky-5: #2f93ea;
+      --text-1: #10324b;
+      --text-2: #517089;
+      --danger: #d94141;
+      --shadow: 0 14px 34px rgba(56, 122, 184, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-1);
+      overflow: hidden; /* Prevent scrolling from video if any */
+      background: transparent;
+    }
+
+    /* Video Background */
+    #bg-video {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -2;
+      object-fit: cover;
+    }
+    
+    .overlay {
+       position: fixed;
+       top: 0;
+       left: 0;
+       width: 100%;
+       height: 100%;
+       /* Removed the white gradient to keep the video clear based on user feedback */
+       background: transparent;
+       z-index: -1;
+    }
+
+    .login-wrapper {
+      width: 100%;
+      max-width: 440px;
+      /* Advanced Glass/Mirror Effect */
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 26px;
+      padding: 45px 40px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), inset 0 0 0 1px rgba(255, 255, 255, 0.1), inset 0 2px 20px rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1;
+      margin: 20px;
+      color: #ffffff;
+    }
+
+    .brand-section {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .brand-logo {
+      height: 140px;
+      width: auto;
+      max-width: 100%;
+      margin-bottom: 20px;
+      animation: breatheGlow 4s ease-in-out infinite;
+      background: transparent;
+    }
+
+    @keyframes breatheGlow {
+      0% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 15px rgba(47, 147, 234, 0.6));
+      }
+      50% { 
+        transform: scale(1.04); 
+        filter: drop-shadow(0 0 35px rgba(47, 147, 234, 1));
+      }
+      100% { 
+        transform: scale(1); 
+        filter: drop-shadow(0 0 15px rgba(47, 147, 234, 0.6));
+      }
+    }
+
+    .brand-section h1 {
+      font-size: 40px;
+      font-weight: 800;
+      color: #ffffff;
+      margin-bottom: 6px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+    }
+
+    .brand-section p {
+      font-size: 15px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+      margin-bottom: 18px;
+    }
+
+    .input-group {
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 8px;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .input-box {
+      width: 100%;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      outline: none;
+      transition: all 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+    
+    .input-box::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .input-box:focus {
+      border-color: #6cc5ff;
+      background: rgba(255, 255, 255, 0.2);
+      box-shadow: 0 0 0 4px rgba(108, 197, 255, 0.3);
+    }
+    
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    
+    .password-wrapper input {
+      padding-right: 45px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #10324b; /* Dark color for visibility over white autofill */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      outline: none;
+      transition: color 0.2s;
+    }
+    
+    .toggle-password:hover {
+      color: #000000;
+    }
+    
+    .toggle-password svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+      font-size: 13px;
+    }
+
+    .remember-me {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      color: #ffffff;
+      font-weight: 600;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .remember-me input {
+      accent-color: #6cc5ff;
+      width: 15px;
+      height: 15px;
+      cursor: pointer;
+    }
+
+    .forgot-pass {
+      color: #6cc5ff;
+      text-decoration: none;
+      font-weight: 700;
+      transition: color 0.2s;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .forgot-pass:hover {
+      text-decoration: underline;
+      color: #b3e0ff;
+    }
+
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #3aa0ff, #1c7bd0);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      padding: 16px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      margin-top: 10px;
+      box-shadow: 0 8px 24px rgba(47, 147, 234, 0.3);
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 28px rgba(47, 147, 234, 0.4);
+    }
+
+    .login-btn:active {
+      transform: translateY(1px);
+    }
+
+    .error-message {
+      background: rgba(255, 240, 240, 0.9);
+      backdrop-filter: blur(4px);
+      color: var(--danger);
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 20px;
+      border: 1px solid #ffd6d6;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Loader Screen */
+    #loader-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none; /* Hidden by default */
+      align-items: center;
+      justify-content: center;
+      background: #05141e;
+      opacity: 0;
+      animation: loaderFadeIn 0.5s forwards;
+    }
+
+    @keyframes loaderFadeIn {
+      to { opacity: 1; }
+    }
+
+    #loader-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      opacity: 0.6;
+      z-index: -1;
+    }
+
+    .loader-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+      z-index: 10000;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .loader-logo {
+      height: 220px;
+      width: auto;
+      border-radius: 16px;
+      filter: drop-shadow(0 10px 40px rgba(0, 0, 0, 0.6));
+      animation: zoomInLogo 3.5s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+    }
+    
+    @keyframes zoomInLogo {
+      0% { transform: scale(0.5); opacity: 0; }
+      15% { opacity: 1; }
+      100% { transform: scale(2.5); opacity: 1; filter: drop-shadow(0 10px 80px rgba(47, 147, 234, 0.5)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading Screen -->
+  <div id="loader-overlay">
+    <video autoplay muted loop playsinline id="loader-video">
+      <source src="Login%20style.mp4" type="video/mp4">
+    </video>
+    <div class="loader-content">
+      <img src="TheBAlogo.png" alt="ZentroNix Logo" class="loader-logo">
+    </div>
+  </div>
+
+  <!-- Video Background -->
+  <video autoplay muted loop playsinline id="bg-video">
+    <source src="Background.mp4" type="video/mp4">
+  </video>
+  <div class="overlay"></div>
+
+  <div class="login-wrapper">
+    <div class="brand-section">
+      <img src="TheBAlogo.png" alt="Logo" class="brand-logo">
+      <h1>ZentroNix</h1>
+      <p>Secure Control Center Access</p>
+    </div>
+
+    <form id="authForm">
+      <div class="input-group">
+        <label for="user">Username</label>
+        <input type="text" id="user" class="input-box" placeholder="Enter your username" required autofocus>
+      </div>
+      
+      <div class="input-group" style="margin-bottom: 14px;">
+        <label for="pass">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="pass" class="input-box" placeholder="Enter your password" required>
+          <button type="button" class="toggle-password" id="togglePassBtn" title="Toggle Password Visibility">
+            <!-- Eye Show SVG -->
+            <svg id="eyeShow" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            <!-- Eye Hide SVG (Hidden by default) -->
+            <svg id="eyeHide" style="display: none;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      
+      <div class="form-options">
+        <label class="remember-me">
+          <input type="checkbox" id="remember">
+          <span>Remember me</span>
+        </label>
+        <a href="#" class="forgot-pass" onclick="alert('Password recovery feature coming soon')">Forgot Password?</a>
+      </div>
+
+      <button type="submit" class="login-btn">Sign In</button>
+      
+      <div id="errorBox" class="error-message">
+        Invalid username or password. Please try again.
+      </div>
+    </form>
+  </div>
+
+  <script src="credentials.js"></script>
+  <script>
+    // Force video autoplay (fallback for strict browsers)
+    document.addEventListener("DOMContentLoaded", () => {
+      const bgVideo = document.getElementById("bg-video");
+      if (bgVideo) {
+        bgVideo.muted = true;
+        bgVideo.play().catch(e => console.log("Autoplay prevented:", e));
+      }
+    });
+
+    // Show/Hide Password Toggle
+    const togglePassBtn = document.getElementById('togglePassBtn');
+    const passInput = document.getElementById('pass');
+    const eyeShow = document.getElementById('eyeShow');
+    const eyeHide = document.getElementById('eyeHide');
+
+    togglePassBtn.addEventListener('click', function() {
+      if (passInput.type === 'password') {
+        passInput.type = 'text';
+        eyeShow.style.display = 'none';
+        eyeHide.style.display = 'block';
+      } else {
+        passInput.type = 'password';
+        eyeShow.style.display = 'block';
+        eyeHide.style.display = 'none';
+      }
+    });
+
+    // Login Auth Logic
+    document.getElementById('authForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const userInput = document.getElementById('user').value.trim();
+      const passVal = document.getElementById('pass').value.trim();
+      const errorBox = document.getElementById('errorBox');
+      const submitBtn = document.querySelector('.login-btn');
+      
+      submitBtn.textContent = 'Verifying...';
+      submitBtn.style.opacity = '0.8';
+      errorBox.style.display = 'none';
+
+      try {
+        if (typeof ZentroNixConfig === 'undefined') {
+          throw new Error('credentials.js file not found or blocked by browser preview.');
+        }
+
+        const validUser = ZentroNixConfig.USERNAME;
+        const validPass = ZentroNixConfig.PASSWORD;
+        
+        if (userInput === validUser && passVal === validPass) {
+          sessionStorage.setItem('zentronix_auth', 'true');
+          
+          // Show loader overlay
+          const loader = document.getElementById('loader-overlay');
+          loader.style.display = 'flex';
+          
+          // Wait 3 seconds, then redirect
+          setTimeout(() => {
+            window.location.replace('ZentroNix.html');
+          }, 3000);
+        } else {
+          errorBox.textContent = 'Invalid username or password. Please try again.';
+          errorBox.style.display = 'block';
+          submitBtn.textContent = 'Sign In';
+          submitBtn.style.opacity = '1';
+        }
+      } catch (err) {
+        console.error('Authentication Error:', err);
+        errorBox.textContent = 'System error: Unable to read credentials file.';
+        errorBox.style.display = 'block';
+        submitBtn.textContent = 'Sign In';
+        submitBtn.style.opacity = '1';
+      }
+    });
+  </script>
+</body>
+</html>

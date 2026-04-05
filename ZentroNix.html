@@ -1,0 +1,1876 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" href="TheBAlogo.png">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    if (sessionStorage.getItem('zentronix_auth') !== 'true') {
+      window.location.replace('index.html');
+    }
+  </script>
+  <script>
+    // Force video autoplay
+    document.addEventListener("DOMContentLoaded", () => {
+    });
+
+    // Initialize Dashboard Charts
+  </script>
+  <title>ZentroNix Dashboard</title>
+  <style>
+    :root {
+      --sky-1: #eaf8ff;
+      --sky-2: #d3f0ff;
+      --sky-3: #a9ddff;
+      --sky-4: #63baf5;
+      --sky-5: #2f93ea;
+      --sky-6: #166cb4;
+      --text-1: #10324b;
+      --text-2: #517089;
+      --border: rgba(255, 255, 255, 0.7);
+      --shadow: 0 14px 34px rgba(56, 122, 184, 0.16);
+      --success: #1f9d57;
+      --warning: #d38b00;
+      --danger: #d94141;
+      --info: #1372c7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      background: #f0f6fc;
+      color: var(--text-1);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .app {
+      display: flex;
+      min-height: 100vh;
+      z-index: 1;
+    }
+
+    .sidebar {
+      width: 265px;
+      background: linear-gradient(180deg, rgba(19, 103, 172, 0.9), rgba(47, 147, 234, 0.85));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: #fff;
+      padding: 24px 16px;
+      box-shadow: 4px 0 24px rgba(17, 88, 145, 0.18);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s ease;
+      z-index: 100;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+
+    .sidebar.collapsed {
+      width: 80px;
+      padding: 24px 12px;
+    }
+
+    .sidebar.collapsed .brand-wrap {
+      margin-top: 40px;
+    }
+
+    .sidebar.collapsed .brand-wrap img {
+      height: 38px !important;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar.collapsed .brand-wrap div {
+      display: none;
+    }
+
+    .sidebar.collapsed .menu-title {
+      display: none;
+    }
+
+    .sidebar.collapsed .menu-btn span {
+      display: none;
+    }
+
+    .sidebar.collapsed .menu-btn {
+      padding: 12px;
+      justify-content: center;
+    }
+
+    .sidebar-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 10;
+    }
+
+    .sidebar-toggle:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .sidebar.collapsed .sidebar-toggle {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%) rotate(180deg);
+    }
+
+    .menu-btn span {
+      white-space: nowrap;
+    }
+
+    .brand-wrap {
+      padding: 10px 10px 18px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      font-size: 24px;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      opacity: 0.92;
+      line-height: 1.5;
+    }
+
+    .menu-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      opacity: 0.86;
+      margin: 18px 8px 10px;
+    }
+
+    .menu-btn {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.12);
+      border: none;
+      color: white;
+      padding: 12px 16px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .menu-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2.2px;
+    }
+
+    .menu-btn:hover,
+    .menu-btn.active {
+      background: white;
+      color: var(--sky-6);
+      transform: translateX(4px);
+    }
+
+    .logout-btn {
+      margin-top: 60px;
+      background: rgba(220, 38, 38, 0.85);
+      color: white;
+      border: 1px solid rgba(255, 100, 100, 0.3);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    }
+
+    .logout-btn:hover {
+      background: #dc2626 !important;
+      color: white !important;
+      border-color: rgba(255, 150, 150, 0.5);
+    }
+
+    .menu-note {
+      background: rgba(255, 255, 255, 0.14);
+      border-radius: 16px;
+      padding: 14px;
+      margin-top: 18px;
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .main {
+      flex: 1;
+      padding: 24px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      
+      background: linear-gradient(90deg, rgba(19, 103, 172, 0.9), rgba(47, 147, 234, 0.85));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding: 20px 26px;
+      border-radius: 24px;
+      box-shadow: 0 10px 28px rgba(17, 88, 145, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .page-title h1 {
+      font-size: 28px;
+      margin-bottom: 6px;
+      color: white;
+      text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    .page-title p {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .action-btn,
+    .filter-select,
+    .search-box input {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 14px;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 6px 18px rgba(64, 123, 182, 0.12);
+      font-size: 14px;
+      color: var(--text-1);
+    }
+
+    .action-btn {
+      background: var(--sky-5);
+      color: white;
+      cursor: pointer;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .action-btn:hover {
+      background: #1c7bd0;
+      transform: translateY(-1px);
+    }
+
+    .search-box input {
+      min-width: 245px;
+      outline: none;
+    }
+
+    .section-panel {
+      display: none;
+    }
+
+    .section-panel.active {
+      display: block;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.86), rgba(221, 243, 255, 0.88), rgba(177, 225, 255, 0.75));
+      border: 1px solid rgba(255, 255, 255, 0.75);
+      border-radius: 26px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .hero-left h2 {
+      font-size: 30px;
+      margin-bottom: 10px;
+      color: #0f517f;
+    }
+
+    .hero-left p {
+      font-size: 14px;
+      line-height: 1.7;
+      color: var(--text-2);
+      max-width: 780px;
+    }
+
+    .badge-row,
+    .chip-row,
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .badge-row {
+      margin-top: 16px;
+    }
+
+    .hero-card-wrap {
+      display: grid;
+      gap: 12px;
+    }
+
+    .hero-small {
+      background: rgba(255, 255, 255, 0.72);
+      border-radius: 18px;
+      padding: 14px 16px;
+      border: 1px solid rgba(255, 255, 255, 0.65);
+    }
+
+    .hero-small .label {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .hero-small .big {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0d5b94;
+    }
+
+    .status-badge,
+    .chip,
+    .pill,
+    .alert-pill {
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status-badge {
+      background: #e3f8ea;
+      color: var(--success);
+    }
+
+    .chip {
+      background: #edf8ff;
+      color: #0e6297;
+      cursor: pointer;
+      transition: 0.2s;
+      border: 1px solid #d6efff;
+    }
+
+    .chip:hover,
+    .chip.active {
+      background: var(--sky-5);
+      color: white;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(8px);
+    }
+
+    .kpi-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .kpi-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      background: linear-gradient(135deg, #d9f2ff, #8ed5ff);
+    }
+
+    .kpi-label {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #155785;
+      margin-bottom: 8px;
+    }
+
+    .kpi-note {
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .up {
+      color: var(--success);
+    }
+
+    .down {
+      color: var(--danger);
+    }
+
+    .flat {
+      color: var(--info);
+    }
+
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 1.3fr 0.95fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .chart-box h3,
+    .table-card h3,
+    .section-title,
+    .list-card h3,
+    .info-card h3 {
+      margin-bottom: 14px;
+      color: #12507a;
+    }
+
+    .chart-header,
+    .panel-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .subtext {
+      color: var(--text-2);
+      font-size: 13px;
+    }
+
+    .fake-chart {
+      height: 250px;
+      display: flex;
+      align-items: end;
+      gap: 10px;
+      padding: 16px 4px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .fake-chart::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(130, 206, 255, 0.08), transparent 60%);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .bar {
+      flex: 1;
+      border-radius: 16px 16px 8px 8px;
+      background: linear-gradient(180deg, #92ddff, var(--sky-5));
+      position: relative;
+      min-width: 26px;
+      box-shadow: inset 0 -8px 10px rgba(255, 255, 255, 0.15);
+      transition: 0.25s ease;
+      cursor: pointer;
+    }
+
+    .bar:hover {
+      transform: translateY(-4px);
+      filter: brightness(1.04);
+    }
+
+    .bar span {
+      position: absolute;
+      bottom: -24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--text-2);
+      font-weight: 700;
+    }
+
+    .bar b {
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 11px;
+    }
+
+    .line-zone {
+      height: 250px;
+      position: relative;
+      background: linear-gradient(180deg, rgba(239, 249, 255, 0.9), rgba(226, 243, 255, 0.7));
+      border-radius: 18px;
+      padding: 14px;
+      overflow: hidden;
+    }
+
+    .line-zone svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .activity-list,
+    .mini-list,
+    .alert-list,
+    .rank-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .mini-item,
+    .activity-item,
+    .alert-item,
+    .rank-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      background: #eff8ff;
+      padding: 14px;
+      border-radius: 16px;
+    }
+
+    .activity-item,
+    .alert-item {
+      border-left: 5px solid var(--sky-5);
+      background: linear-gradient(135deg, #f6fbff, #e9f6ff);
+    }
+
+    .alert-item.warning {
+      border-left-color: var(--warning);
+    }
+
+    .alert-item.danger {
+      border-left-color: var(--danger);
+    }
+
+    .alert-item.success {
+      border-left-color: var(--success);
+    }
+
+    .item-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-1);
+      margin-bottom: 4px;
+    }
+
+    .item-text,
+    .item-meta {
+      font-size: 12px;
+      color: var(--text-2);
+      line-height: 1.5;
+    }
+
+    .tag {
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .tag.success {
+      background: #d7f5df;
+      color: #1b7f37;
+    }
+
+    .tag.warning {
+      background: #fff3d5;
+      color: #9a6a00;
+    }
+
+    .tag.danger {
+      background: #ffe0e0;
+      color: #bb2f2f;
+    }
+
+    .tag.info {
+      background: #dff2ff;
+      color: #0f6ab4;
+    }
+
+    .summary-box {
+      background: linear-gradient(135deg, rgba(31, 126, 214, 0.12), rgba(89, 186, 245, 0.18));
+      border: 1px solid #d1efff;
+      border-radius: 20px;
+      padding: 18px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .summary-box h3 {
+      margin-bottom: 8px;
+      color: #0f5c93;
+    }
+
+    .summary-box p {
+      line-height: 1.7;
+      color: var(--text-1);
+      font-size: 14px;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .three-col {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .progress-row {
+      display: grid;
+      gap: 12px;
+    }
+
+    .progress-item {
+      display: grid;
+      gap: 8px;
+    }
+
+    .progress-line {
+      height: 10px;
+      background: #e5f3fc;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #82d4ff, var(--sky-5));
+    }
+
+    .progress-head {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-1);
+    }
+
+    .table-card {
+      overflow: hidden;
+    }
+
+    .table-tools {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .table-filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 18px;
+      border: 1px solid #e2f1fb;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+      background: white;
+    }
+
+    thead {
+      background: #dff1ff;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    th,
+    td {
+      padding: 13px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e6f1f8;
+      font-size: 14px;
+    }
+
+    tbody tr {
+      transition: 0.2s;
+      cursor: pointer;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fbfeff;
+    }
+
+    tbody tr:hover {
+      background: #eef8ff;
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .pagination {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      border: none;
+      background: #edf8ff;
+      color: #0e6297;
+      padding: 10px 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .page-btn.active,
+    .page-btn:hover {
+      background: var(--sky-5);
+      color: white;
+    }
+
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .metric-box {
+      background: #f4fbff;
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid #dff1ff;
+    }
+
+    .metric-box .small {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
+
+    .metric-box .big {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f5e97;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 38, 63, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 30;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(860px, 100%);
+      background: white;
+      border-radius: 26px;
+      padding: 22px;
+      box-shadow: 0 20px 48px rgba(4, 29, 49, 0.28);
+      position: relative;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 50%;
+      background: #edf8ff;
+      color: #0d5d95;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+      padding-right: 48px;
+    }
+
+    .modal-head h3 {
+      font-size: 24px;
+      color: #0f5484;
+      margin-bottom: 6px;
+    }
+
+    .modal-sub {
+      color: var(--text-2);
+      font-size: 14px;
+    }
+
+    .modal-section {
+      margin-bottom: 18px;
+    }
+
+    .modal-section h4 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #0e6098;
+    }
+
+    .list-dot {
+      display: grid;
+      gap: 8px;
+    }
+
+    .list-dot div {
+      background: #f5fbff;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: var(--text-1);
+    }
+
+    .muted {
+      color: var(--text-2);
+      font-size: 13px;
+    }
+
+    @media (max-width: 1180px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .app {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+
+      .main {
+        padding: 16px;
+      }
+
+      .search-box input {
+        min-width: 180px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <i data-lucide="chevron-left"></i>
+      </button>
+      <div class="brand-wrap" style="display: flex; flex-direction: column; align-items: center; gap: 14px; padding-bottom: 20px; padding-top: 10px; transition: all 0.3s ease;">
+        <img src="TheBAlogo.png" alt="Logo" style="height: 85px; width: auto; border-radius: 12px; filter: drop-shadow(0 6px 16px rgba(0,0,0,0.3)); transition: all 0.3s ease;">
+        <div style="font-size: 11px; font-weight: 700; color: rgba(255, 255, 255, 0.85); letter-spacing: 0.8px; text-transform: uppercase; text-shadow: 0 1px 3px rgba(0,0,0,0.3); text-align: center;">Product of : The BA Support</div>
+      </div>
+
+      <div class="menu-title">Main Menu</div>
+      <button class="menu-btn active" onclick="showSection('overview', this)"><i data-lucide="layout-dashboard"></i> <span>Overview</span></button>
+      <button class="menu-btn" onclick="showSection('realtime', this)"><i data-lucide="activity"></i> <span>Real-Time Monitor</span></button>
+      <button class="menu-btn" onclick="showSection('players', this)"><i data-lucide="users"></i> <span>Player Tracking</span></button>
+      <button class="menu-btn" onclick="showSection('cost', this)"><i data-lucide="coins"></i> <span>Cost Analysis</span></button>
+      <button class="menu-btn" onclick="showSection('failures', this)"><i data-lucide="alert-triangle"></i> <span>Failure Log</span></button>
+      <button class="menu-btn" onclick="showSection('reports', this)"><i data-lucide="file-text"></i> <span>Reports</span></button>
+      <button class="menu-btn" onclick="showSection('settings', this)"><i data-lucide="settings"></i> <span>Settings</span></button>
+
+      <div class="menu-title" style="margin-top: 20px;">Quick Actions</div>
+      <button class="menu-btn" onclick="refreshData()"><i data-lucide="refresh-ccw"></i> <span>Refresh Data</span></button>
+      <button class="menu-btn" onclick="notifyAction('Export started')"><i data-lucide="download"></i> <span>Export CSV</span></button>
+      <button class="menu-btn" onclick="notifyAction('Notification center opened')"><i data-lucide="bell"></i> <span>Notifications</span></button>
+      <button class="menu-btn" onclick="notifyAction('Provider panel opened')"><i data-lucide="heart-pulse"></i> <span>Provider Health</span></button>
+      <button class="menu-btn" onclick="notifyAction('Fraud watch opened')"><i data-lucide="shield-alert"></i> <span>Fraud Watch</span></button>
+      <button class="menu-btn" onclick="notifyAction('Support tools opened')"><i data-lucide="wrench"></i> <span>Support Tools</span></button>
+      <button class="menu-btn" onclick="notifyAction('Help center opened')"><i data-lucide="help-circle"></i> <span>Help Center</span></button>
+      <button class="menu-btn logout-btn" onclick="logout()"><i data-lucide="log-out"></i> <span>Logout</span></button>
+    </aside>
+
+    <main class="main">
+      <div class="topbar">
+        <div class="page-title">
+          <h1>ZentroNix Dashboard</h1>
+          <p>Track real-time OTP requests, spending, provider health, and player activity in one simple view.</p>
+        </div>
+        <div class="top-actions">
+          <div class="search-box"><input id="globalSearch" type="text"
+              placeholder="Search email, phone, player ID..." /></div>
+          <select class="filter-select" id="dateFilter">
+            <option>Today</option>
+            <option>Last 7 Days</option>
+            <option>Last 30 Days</option>
+          </select>
+          <button class="action-btn" onclick="notifyAction('Dashboard refreshed')">Refresh</button>
+        </div>
+      </div>
+
+      <section id="overview" class="section-panel active">
+        <div class="hero">
+          <div class="hero-left">
+            <h2>ZentroNix Control Center</h2>
+            <p>Monitor OTP sending volume, delivery health, spending, suspicious activity, and player-level history for
+              SMS and Email. This upgraded view is designed to look clean, premium, and impressive while still being
+              easy to track every request.</p>
+            <div class="badge-row">
+              <span class="status-badge">● System Healthy</span>
+              <span class="chip active" onclick="toggleChip(this)">Today</span>
+              <span class="chip" onclick="toggleChip(this)">SMS Only</span>
+              <span class="chip" onclick="toggleChip(this)">Email Only</span>
+              <span class="chip" onclick="toggleChip(this)">Failed</span>
+              <span class="chip" onclick="toggleChip(this)">High Cost</span>
+              <span class="chip" onclick="toggleChip(this)">Suspicious</span>
+            </div>
+          </div>
+          <div class="hero-card-wrap">
+            <div class="hero-small">
+              <div class="label">Live Clock</div>
+              <div class="big" id="liveClock">--:--:--</div>
+            </div>
+            <div class="hero-small">
+              <div class="label">Last Refresh</div>
+              <div class="big" id="lastRefresh">Just now</div>
+            </div>
+            <div class="hero-small">
+              <div class="label">Active Players Today</div>
+              <div class="big">4,892</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">📨</div><span class="tag info">Live</span>
+            </div>
+            <div class="kpi-label">Total OTP Sent</div>
+            <div class="kpi-value">12,480</div>
+            <div class="kpi-note up">▲ +8.2% vs yesterday</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">💰</div><span class="tag warning">Cost</span>
+            </div>
+            <div class="kpi-label">Total OTP Cost</div>
+            <div class="kpi-value">$428.90</div>
+            <div class="kpi-note up">▲ +5.4% spending trend</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">📱</div><span class="tag info">SMS</span>
+            </div>
+            <div class="kpi-label">SMS OTP</div>
+            <div class="kpi-value">8,910</div>
+            <div class="kpi-note flat">71.4% of total traffic</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">📧</div><span class="tag success">Email</span>
+            </div>
+            <div class="kpi-label">Email OTP</div>
+            <div class="kpi-value">3,570</div>
+            <div class="kpi-note flat">28.6% of total traffic</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">✅</div><span class="tag success">Healthy</span>
+            </div>
+            <div class="kpi-label">Success Rate</div>
+            <div class="kpi-value">97.3%</div>
+            <div class="kpi-note up">▲ Delivery stable</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">⚠️</div><span class="tag danger">Watch</span>
+            </div>
+            <div class="kpi-label">Failed OTP</div>
+            <div class="kpi-value">340</div>
+            <div class="kpi-note down">▼ Needs monitoring</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">👤</div><span class="tag info">Users</span>
+            </div>
+            <div class="kpi-label">Unique Players</div>
+            <div class="kpi-value">4,892</div>
+            <div class="kpi-note up">▲ +6.8% active users</div>
+          </div>
+          <div class="card">
+            <div class="kpi-top">
+              <div class="kpi-icon">🛡️</div><span class="tag warning">Risk</span>
+            </div>
+            <div class="kpi-label">Suspicious Attempts</div>
+            <div class="kpi-value">89</div>
+            <div class="kpi-note down">▼ 12 under review</div>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="card chart-box">
+            <div class="chart-header">
+              <div>
+                <h3>OTP Volume by Hour</h3>
+                <div class="subtext">Live traffic trend across the day</div>
+              </div>
+              <span class="tag info">Updated live</span>
+            </div>
+            <div class="fake-chart">
+              <div class="bar" style="height: 34%"><b>420</b><span>08</span></div>
+              <div class="bar" style="height: 46%"><b>510</b><span>09</span></div>
+              <div class="bar" style="height: 58%"><b>640</b><span>10</span></div>
+              <div class="bar" style="height: 72%"><b>780</b><span>11</span></div>
+              <div class="bar" style="height: 86%"><b>920</b><span>12</span></div>
+              <div class="bar" style="height: 68%"><b>720</b><span>13</span></div>
+              <div class="bar" style="height: 62%"><b>680</b><span>14</span></div>
+              <div class="bar" style="height: 82%"><b>890</b><span>15</span></div>
+            </div>
+          </div>
+
+          <div class="card chart-box">
+            <div class="chart-header">
+              <div>
+                <h3>Cost Trend</h3>
+                <div class="subtext">Spending movement by hour</div>
+              </div>
+              <span class="tag warning">$428.90 today</span>
+            </div>
+            <div class="line-zone">
+              <svg viewBox="0 0 600 260" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="fillBlue" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#6cc5ff" stop-opacity="0.45"></stop>
+                    <stop offset="100%" stop-color="#6cc5ff" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <path
+                  d="M0 210 L60 190 L120 184 L180 162 L240 144 L300 132 L360 156 L420 148 L480 122 L540 108 L600 92 L600 260 L0 260 Z"
+                  fill="url(#fillBlue)"></path>
+                <path d="M0 210 L60 190 L120 184 L180 162 L240 144 L300 132 L360 156 L420 148 L480 122 L540 108 L600 92"
+                  fill="none" stroke="#1e88db" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path>
+                <circle cx="600" cy="92" r="8" fill="#1e88db"></circle>
+              </svg>
+            </div>
+          </div>
+
+          <div class="card list-card">
+            <div class="panel-head">
+              <div>
+                <h3>Live Activity</h3>
+                <div class="subtext">Recent activity feed</div>
+              </div>
+              <span class="tag info">8 new</span>
+            </div>
+            <div class="activity-list">
+              <div class="activity-item">
+                <div>
+                  <div class="item-title">Player P10234 requested SMS OTP</div>
+                  <div class="item-text">Login OTP sent to masked phone number via Twilio.</div>
+                </div>
+                <div class="item-meta">1 min ago</div>
+              </div>
+              <div class="activity-item">
+                <div>
+                  <div class="item-title">Email OTP failed</div>
+                  <div class="item-text">Bounce detected for yahoo domain during withdrawal flow.</div>
+                </div>
+                <div class="item-meta">3 min ago</div>
+              </div>
+              <div class="activity-item">
+                <div>
+                  <div class="item-title">Provider delay detected</div>
+                  <div class="item-text">SendGrid latency crossed 2.8 seconds for a short window.</div>
+                </div>
+                <div class="item-meta">7 min ago</div>
+              </div>
+              <div class="activity-item">
+                <div>
+                  <div class="item-title">Retry spike watch</div>
+                  <div class="item-text">Multiple retry attempts flagged from two phone numbers.</div>
+                </div>
+                <div class="item-meta">11 min ago</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="three-col">
+          <div class="card info-card">
+            <div class="panel-head">
+              <div>
+                <h3>Alert Center</h3>
+                <div class="subtext">Important issues to review</div>
+              </div>
+              <span class="tag danger">3 critical</span>
+            </div>
+            <div class="alert-list">
+              <div class="alert-item danger">
+                <div>
+                  <div class="item-title">High OTP retries from one phone</div>
+                  <div class="item-text">11 requests within 9 minutes for the same masked number.</div>
+                </div>
+                <span class="tag danger">Critical</span>
+              </div>
+              <div class="alert-item warning">
+                <div>
+                  <div class="item-title">Email bounce rate increased</div>
+                  <div class="item-text">Public email domains show slightly higher bounce trend.</div>
+                </div>
+                <span class="tag warning">Warning</span>
+              </div>
+              <div class="alert-item success">
+                <div>
+                  <div class="item-title">Twilio delivery stable</div>
+                  <div class="item-text">Success rate remains above 98% in the last hour.</div>
+                </div>
+                <span class="tag success">Healthy</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card info-card">
+            <div class="panel-head">
+              <div>
+                <h3>Top 5 Players by OTP Cost</h3>
+                <div class="subtext">Most expensive users today</div>
+              </div>
+              <span class="tag info">Today</span>
+            </div>
+            <div class="rank-list">
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">P10991</div>
+                  <div class="item-meta">14 OTP requests</div>
+                </div><strong>$12.40</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">P11682</div>
+                  <div class="item-meta">12 OTP requests</div>
+                </div><strong>$11.20</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">P10234</div>
+                  <div class="item-meta">10 OTP requests</div>
+                </div><strong>$10.90</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">P11805</div>
+                  <div class="item-meta">9 OTP requests</div>
+                </div><strong>$9.85</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">P11143</div>
+                  <div class="item-meta">9 OTP requests</div>
+                </div><strong>$9.30</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="card info-card">
+            <div class="panel-head">
+              <div>
+                <h3>Provider Performance</h3>
+                <div class="subtext">Delivery rate and latency</div>
+              </div>
+              <span class="tag success">All providers online</span>
+            </div>
+            <div class="progress-row">
+              <div class="progress-item">
+                <div class="progress-head"><span>Twilio</span><span>98.7%</span></div>
+                <div class="progress-line">
+                  <div class="progress-fill" style="width: 98.7%"></div>
+                </div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-head"><span>SendGrid</span><span>94.2%</span></div>
+                <div class="progress-line">
+                  <div class="progress-fill" style="width: 94.2%"></div>
+                </div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-head"><span>Infobip</span><span>96.8%</span></div>
+                <div class="progress-line">
+                  <div class="progress-fill" style="width: 96.8%"></div>
+                </div>
+              </div>
+              <div class="progress-item">
+                <div class="progress-head"><span>Vonage</span><span>95.6%</span></div>
+                <div class="progress-line">
+                  <div class="progress-fill" style="width: 95.6%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col">
+          <div class="card info-card">
+            <div class="panel-head">
+              <div>
+                <h3>Channel Comparison</h3>
+                <div class="subtext">SMS versus Email performance</div>
+              </div>
+              <span class="tag info">Compare</span>
+            </div>
+            <div class="metric-grid">
+              <div class="metric-box">
+                <div class="small">SMS Volume</div>
+                <div class="big">8,910</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Email Volume</div>
+                <div class="big">3,570</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">SMS Avg Cost</div>
+                <div class="big">$0.03</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Email Avg Cost</div>
+                <div class="big">$0.01</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">SMS Success</div>
+                <div class="big">98.1%</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Email Success</div>
+                <div class="big">95.4%</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card info-card">
+            <div class="panel-head">
+              <div>
+                <h3>Top Country Traffic</h3>
+                <div class="subtext">OTP volume by region</div>
+              </div>
+              <span class="tag info">Geo</span>
+            </div>
+            <div class="rank-list">
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Cambodia</div>
+                  <div class="item-meta">Main OTP market today</div>
+                </div><strong>5,260</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Thailand</div>
+                  <div class="item-meta">Strong SMS traffic</div>
+                </div><strong>2,980</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Vietnam</div>
+                  <div class="item-meta">Stable email verification</div>
+                </div><strong>1,870</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Malaysia</div>
+                  <div class="item-meta">Growing login activity</div>
+                </div><strong>1,420</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Singapore</div>
+                  <div class="item-meta">High-value users</div>
+                </div><strong>950</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card table-card">
+          <div class="panel-head">
+            <div>
+              <h3>Live OTP Tracking Table</h3>
+              <div class="subtext">Click any row to open a player detail popup.</div>
+            </div>
+            <span class="tag info">12,480 records today</span>
+          </div>
+
+          <div class="table-tools">
+            <div class="table-filters">
+              <select class="filter-select">
+                <option>All Channels</option>
+                <option>SMS</option>
+                <option>Email</option>
+              </select>
+              <select class="filter-select">
+                <option>All Status</option>
+                <option>Delivered</option>
+                <option>Failed</option>
+                <option>Verified</option>
+                <option>Pending</option>
+              </select>
+              <select class="filter-select">
+                <option>All OTP Type</option>
+                <option>Login</option>
+                <option>Withdrawal</option>
+                <option>Registration</option>
+                <option>Reset Password</option>
+              </select>
+              <button class="chip" onclick="notifyAction('Quick filter applied')">High Cost</button>
+              <button class="chip" onclick="notifyAction('Suspicious filter applied')">Suspicious</button>
+            </div>
+            <button class="action-btn" onclick="notifyAction('CSV export started')">Export</button>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Request ID</th>
+                  <th>Player ID</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Channel</th>
+                  <th>OTP Type</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                  <th>Cost</th>
+                  <th>Retry</th>
+                  <th>Risk Flag</th>
+                  <th>Failure Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  onclick="openModal('P10234','RQ-12001','a***@gmail.com','***7788','SMS','Login','Twilio','Delivered','$0.03','0','Low','-')">
+                  <td>2026-03-23 10:22:14</td>
+                  <td>RQ-12001</td>
+                  <td>P10234</td>
+                  <td>a***@gmail.com</td>
+                  <td>***7788</td>
+                  <td>SMS</td>
+                  <td>Login</td>
+                  <td>Twilio</td>
+                  <td><span class="tag success">Delivered</span></td>
+                  <td>$0.03</td>
+                  <td>0</td>
+                  <td><span class="tag success">Low</span></td>
+                  <td>-</td>
+                </tr>
+                <tr
+                  onclick="openModal('P10991','RQ-12002','b***@yahoo.com','***5531','Email','Withdrawal','SendGrid','Failed','$0.01','1','Medium','Bounce')">
+                  <td>2026-03-23 10:23:09</td>
+                  <td>RQ-12002</td>
+                  <td>P10991</td>
+                  <td>b***@yahoo.com</td>
+                  <td>***5531</td>
+                  <td>Email</td>
+                  <td>Withdrawal</td>
+                  <td>SendGrid</td>
+                  <td><span class="tag danger">Failed</span></td>
+                  <td>$0.01</td>
+                  <td>1</td>
+                  <td><span class="tag warning">Medium</span></td>
+                  <td>Bounce</td>
+                </tr>
+                <tr
+                  onclick="openModal('P10677','RQ-12003','c***@outlook.com','***1199','SMS','Reset Password','Infobip','Verified','$0.04','0','Low','-')">
+                  <td>2026-03-23 10:24:44</td>
+                  <td>RQ-12003</td>
+                  <td>P10677</td>
+                  <td>c***@outlook.com</td>
+                  <td>***1199</td>
+                  <td>SMS</td>
+                  <td>Reset Password</td>
+                  <td>Infobip</td>
+                  <td><span class="tag info">Verified</span></td>
+                  <td>$0.04</td>
+                  <td>0</td>
+                  <td><span class="tag success">Low</span></td>
+                  <td>-</td>
+                </tr>
+                <tr
+                  onclick="openModal('P11298','RQ-12004','d***@hotmail.com','***9012','SMS','Registration','Twilio','Pending','$0.03','0','Low','Waiting delivery')">
+                  <td>2026-03-23 10:25:33</td>
+                  <td>RQ-12004</td>
+                  <td>P11298</td>
+                  <td>d***@hotmail.com</td>
+                  <td>***9012</td>
+                  <td>SMS</td>
+                  <td>Registration</td>
+                  <td>Twilio</td>
+                  <td><span class="tag warning">Pending</span></td>
+                  <td>$0.03</td>
+                  <td>0</td>
+                  <td><span class="tag success">Low</span></td>
+                  <td>Waiting delivery</td>
+                </tr>
+                <tr
+                  onclick="openModal('P11805','RQ-12005','e***@gmail.com','***2244','SMS','Login','Vonage','Delivered','$0.03','2','High','Multiple requests')">
+                  <td>2026-03-23 10:27:14</td>
+                  <td>RQ-12005</td>
+                  <td>P11805</td>
+                  <td>e***@gmail.com</td>
+                  <td>***2244</td>
+                  <td>SMS</td>
+                  <td>Login</td>
+                  <td>Vonage</td>
+                  <td><span class="tag success">Delivered</span></td>
+                  <td>$0.03</td>
+                  <td>2</td>
+                  <td><span class="tag danger">High</span></td>
+                  <td>Multiple requests</td>
+                </tr>
+                <tr
+                  onclick="openModal('P11143','RQ-12006','f***@icloud.com','***4409','Email','Verification','SendGrid','Verified','$0.01','0','Low','-')">
+                  <td>2026-03-23 10:29:01</td>
+                  <td>RQ-12006</td>
+                  <td>P11143</td>
+                  <td>f***@icloud.com</td>
+                  <td>***4409</td>
+                  <td>Email</td>
+                  <td>Verification</td>
+                  <td>SendGrid</td>
+                  <td><span class="tag info">Verified</span></td>
+                  <td>$0.01</td>
+                  <td>0</td>
+                  <td><span class="tag success">Low</span></td>
+                  <td>-</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="footer-actions">
+            <div class="muted">Showing 1 to 6 of 12,480 rows</div>
+            <div class="pagination">
+              <button class="page-btn">Prev</button>
+              <button class="page-btn active">1</button>
+              <button class="page-btn">2</button>
+              <button class="page-btn">3</button>
+              <button class="page-btn">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="realtime" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Real-Time Monitor</h3>
+            <p class="subtext">Use this section for live OTP traffic, request spikes, queue depth, and provider latency
+              tracking.</p>
+            <div class="pill-row" style="margin-top: 14px;">
+              <div class="pill" style="background:#e6f8ee;color:#1a8e4a;">Live Requests: 245</div>
+              <div class="pill" style="background:#fff7df;color:#a06c00;">Pending: 17</div>
+              <div class="pill" style="background:#e9f5ff;color:#0f6ab4;">Alerts: 5</div>
+              <div class="pill" style="background:#ffe8e8;color:#bf3535;">Latency Watch: 2</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Provider Health</h3>
+            <div class="mini-list">
+              <div class="mini-item"><strong>Twilio</strong><span class="tag success">Stable</span></div>
+              <div class="mini-item"><strong>SendGrid</strong><span class="tag warning">Slight Delay</span></div>
+              <div class="mini-item"><strong>Infobip</strong><span class="tag success">Stable</span></div>
+              <div class="mini-item"><strong>Vonage</strong><span class="tag info">Normal</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="players" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Player Tracking</h3>
+            <p class="subtext">Search players by email, phone number, and player ID to review OTP history, risk
+              patterns, and total spend quickly.</p>
+            <div class="pill-row" style="margin-top: 14px;">
+              <div class="pill">Search by Email</div>
+              <div class="pill">Search by Phone</div>
+              <div class="pill">Search by Player ID</div>
+              <div class="pill">Retry History</div>
+              <div class="pill">Fraud Check</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Top Phone Numbers</h3>
+            <div class="rank-list">
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">***2244</div>
+                  <div class="item-meta">11 OTP requests</div>
+                </div><strong>High</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">***7788</div>
+                  <div class="item-meta">10 OTP requests</div>
+                </div><strong>Medium</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">***5531</div>
+                  <div class="item-meta">8 OTP requests</div>
+                </div><strong>Medium</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cost" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Cost Analysis</h3>
+            <p class="subtext">Track OTP spending by channel, provider, country, and player segment.</p>
+            <div class="metric-grid" style="margin-top: 14px;">
+              <div class="metric-box">
+                <div class="small">SMS Spend</div>
+                <div class="big">$310.40</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Email Spend</div>
+                <div class="big">$118.50</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Avg Cost / Success</div>
+                <div class="big">$0.028</div>
+              </div>
+              <div class="metric-box">
+                <div class="small">Provider Fees</div>
+                <div class="big">$42.00</div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Top Spending Drivers</h3>
+            <div class="mini-list">
+              <div class="mini-item"><strong>SMS Login</strong><span>$140.20</span></div>
+              <div class="mini-item"><strong>Withdrawal Email OTP</strong><span>$89.40</span></div>
+              <div class="mini-item"><strong>Password Reset SMS</strong><span>$80.80</span></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="failures" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Failure Log</h3>
+            <p class="subtext">Review failed delivery, bounce issues, expired requests, and suspicious patterns.</p>
+            <div class="pill-row" style="margin-top: 14px;">
+              <div class="pill">Bounce</div>
+              <div class="pill">Invalid Number</div>
+              <div class="pill">Timeout</div>
+              <div class="pill">Rate Limit</div>
+              <div class="pill">Blocked Provider</div>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Failure Reasons</h3>
+            <div class="rank-list">
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Bounce</div>
+                  <div class="item-meta">Email domain issue</div>
+                </div><strong>122</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Timeout</div>
+                  <div class="item-meta">Provider delay</div>
+                </div><strong>83</strong>
+              </div>
+              <div class="rank-item">
+                <div>
+                  <div class="item-title">Rate Limit</div>
+                  <div class="item-meta">Too many requests</div>
+                </div><strong>61</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="reports" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Reports</h3>
+            <p class="subtext">Place daily, weekly, and monthly summaries here for finance, operations, and support
+              teams.</p>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Quick Report Actions</h3>
+            <div class="pill-row">
+              <div class="pill">Daily Summary</div>
+              <div class="pill">Weekly Spend</div>
+              <div class="pill">Failure Summary</div>
+              <div class="pill">Provider Report</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="settings" class="section-panel">
+        <div class="two-col">
+          <div class="card">
+            <h3 class="section-title">Settings</h3>
+            <p class="subtext">Use this menu for dashboard preferences, role access control, alert rules, and refresh
+              interval configuration.</p>
+          </div>
+          <div class="card">
+            <h3 class="section-title">Display Options</h3>
+            <div class="pill-row">
+              <div class="pill">Mask Contact Data</div>
+              <div class="pill">30s Auto Refresh</div>
+              <div class="pill">Email Alerts</div>
+              <div class="pill">Fraud Mode</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal" id="detailModal">
+    <div class="modal-card">
+      <button class="close-btn" onclick="closeModal()">×</button>
+      <div class="modal-head">
+        <div>
+          <h3 id="modalPlayer">Player Details</h3>
+          <div class="modal-sub" id="modalRequest">Request info</div>
+        </div>
+        <span class="tag info" id="modalStatus">Status</span>
+      </div>
+
+      <div class="modal-section">
+        <h4>Tracking Information</h4>
+        <div class="metric-grid">
+          <div class="metric-box">
+            <div class="small">Email</div>
+            <div class="big" id="modalEmail" style="font-size:18px;">-</div>
+          </div>
+          <div class="metric-box">
+            <div class="small">Phone</div>
+            <div class="big" id="modalPhone" style="font-size:18px;">-</div>
+          </div>
+          <div class="metric-box">
+            <div class="small">Channel</div>
+            <div class="big" id="modalChannel" style="font-size:18px;">-</div>
+          </div>
+          <div class="metric-box">
+            <div class="small">OTP Type</div>
+            <div class="big" id="modalOtpType" style="font-size:18px;">-</div>
+          </div>
+          <div class="metric-box">
+            <div class="small">Provider</div>
+            <div class="big" id="modalProvider" style="font-size:18px;">-</div>
+          </div>
+          <div class="metric-box">
+            <div class="small">Cost</div>
+            <div class="big" id="modalCost" style="font-size:18px;">-</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Risk and Retry</h4>
+        <div class="list-dot">
+          <div><strong>Retry Count:</strong> <span id="modalRetry">0</span></div>
+          <div><strong>Risk Level:</strong> <span id="modalRisk">Low</span></div>
+          <div><strong>Failure Reason:</strong> <span id="modalFailure">-</span></div>
+          <div><strong>Suggested Action:</strong> Review repeated failures, verify provider health, and check if user is
+            retrying too often.</div>
+        </div>
+      </div>
+
+      <div class="modal-section">
+        <h4>Recent Player History</h4>
+        <div class="list-dot">
+          <div>10:12 - Login OTP requested via SMS</div>
+          <div>09:48 - Email OTP verified successfully</div>
+          <div>09:11 - SMS OTP delivered</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function showSection(sectionId, button) {
+      const sections = document.querySelectorAll('.section-panel');
+      const buttons = document.querySelectorAll('.menu-btn');
+      sections.forEach(section => section.classList.remove('active'));
+      buttons.forEach(btn => btn.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      button.classList.add('active');
+    }
+
+    function toggleChip(el) {
+      el.classList.toggle('active');
+    }
+
+    function notifyAction(message) {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString();
+      document.getElementById('lastRefresh').textContent = timeString;
+      alert(message);
+    }
+
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('liveClock').textContent = now.toLocaleTimeString();
+    }
+
+    function openModal(player, requestId, email, phone, channel, otpType, provider, status, cost, retry, risk, failure) {
+      document.getElementById('modalPlayer').textContent = 'Player ' + player;
+      document.getElementById('modalRequest').textContent = 'Request ID: ' + requestId;
+      document.getElementById('modalEmail').textContent = email;
+      document.getElementById('modalPhone').textContent = phone;
+      document.getElementById('modalChannel').textContent = channel;
+      document.getElementById('modalOtpType').textContent = otpType;
+      document.getElementById('modalProvider').textContent = provider;
+      document.getElementById('modalCost').textContent = cost;
+      document.getElementById('modalRetry').textContent = retry;
+      document.getElementById('modalRisk').textContent = risk;
+      document.getElementById('modalFailure').textContent = failure;
+
+      const statusEl = document.getElementById('modalStatus');
+      statusEl.textContent = status;
+      statusEl.className = 'tag info';
+      if (status === 'Delivered') statusEl.className = 'tag success';
+      if (status === 'Failed') statusEl.className = 'tag danger';
+      if (status === 'Pending') statusEl.className = 'tag warning';
+      if (status === 'Verified') statusEl.className = 'tag info';
+
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    function logout() {
+      sessionStorage.removeItem('zentronix_auth');
+      window.location.replace('login.html');
+    }
+
+    document.getElementById('detailModal').addEventListener('click', function (e) {
+      if (e.target.id === 'detailModal') {
+        closeModal();
+      }
+    });
+
+    document.getElementById('globalSearch').addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') {
+        alert('Search triggered for: ' + this.value);
+      }
+    });
+
+    updateClock();
+    setInterval(updateClock, 1000);
+    
+    // Sidebar Toggle
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      sidebar.classList.toggle('collapsed');
+    }
+
+    // Initialize Lucide Icons
+    lucide.createIcons();
+  </script>
+</body>
+
+</html>
