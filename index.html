@@ -52,8 +52,8 @@
        left: 0;
        width: 100%;
        height: 100%;
-       /* Removed the white gradient to keep the video clear based on user feedback */
-       background: transparent;
+       /* Added a dark tint so the bright blue burst doesn't wash out the white text */
+       background: radial-gradient(circle at center, rgba(0, 15, 30, 0.4) 0%, rgba(0, 5, 15, 0.7) 100%);
        z-index: -1;
     }
 
@@ -336,7 +336,7 @@
 
   <!-- Video Background -->
   <video autoplay muted loop playsinline id="bg-video">
-    <source src="Login%20style.mp4" type="video/mp4">
+    <source src="Background.mp4" type="video/mp4">
   </video>
   <div class="overlay"></div>
 
