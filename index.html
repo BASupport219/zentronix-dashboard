@@ -429,15 +429,14 @@
       errorBox.style.display = 'none';
 
       try {
-        if (typeof ZentroNixConfig === 'undefined') {
-          throw new Error('credentials.js file not found or blocked by browser preview.');
+        if (typeof ZentroNixConfig === 'undefined' || !ZentroNixConfig.USERS) {
+          throw new Error('credentials.js file not found or malformed.');
         }
 
-        const validUser = ZentroNixConfig.USERNAME;
-        const validPass = ZentroNixConfig.PASSWORD;
-        
-        if (userInput === validUser && passVal === validPass) {
+        const validPassForUser = ZentroNixConfig.USERS[userInput];
+        if (validPassForUser && passVal === validPassForUser) {
           sessionStorage.setItem('zentronix_auth', 'true');
+          sessionStorage.setItem('zentronix_logged_user', userInput);
           
           // Show loader overlay
           const loader = document.getElementById('loader-overlay');
